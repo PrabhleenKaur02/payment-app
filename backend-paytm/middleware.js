@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-require('dotenv').config()
-const JWT_SECRET = process.env.JWT_SECRET
+const rateLimit = require("express-rate-limit")
+const {JWT_SECRET} = require('./config')
 
 const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -29,4 +29,13 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-module.exports = authMiddleware;
+const loginLimit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: "Too many login attemps. Please try again later"
+})
+
+module.exports = {
+    authMiddleware,
+    loginLimit
+}

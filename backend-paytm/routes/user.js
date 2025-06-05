@@ -4,10 +4,10 @@ const zod = require("zod");
 const { User, Account } = require('../db')
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require('../config');
-const authMiddleware = require('../middleware');
+const { authMiddleware, loginLimit } = require('../middleware');
 
 
-// USER SIGNUP
+// USER SIGNUP, imput validation
 const signupSchema = zod.object({
     username: zod.string(),
     firstName: zod.string(),
@@ -71,7 +71,7 @@ const signinSchema = zod.object({
     password: zod.string()
 });
 
-    router.post('/signin', async(req, res) => {
+    router.post('/signin', loginLimit, async(req, res) => {
        
     const {success} = signinSchema.safeParse(req.body);
     if(!success) {
@@ -151,11 +151,13 @@ router.get('/bulk', async(req, res) => {
     const users = await User.find({
         $or : [{
             firstName: {
-                "$regex": filter
+                "$regex": filter,
+                "$options": "i"
             }
         }, {
             lastName: {
-                "$regex": filter
+                "$regex": filter,
+                "$options": "i"
             }
         }]
     });

@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-require('dotenv').config()
+const {MONGO_URL} = require('./config')
 
-mongoose.connect(process.env.MONGO_URL);
-
+mongoose.connect(MONGO_URL).then(()=> console.log("Successfully connected to the database!")).
+catch (error => console.log("Failed to connect to the database"))
 // USER SCHEMA
 const userSchema = new mongoose.Schema({
   username: {
